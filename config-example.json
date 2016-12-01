@@ -6,5 +6,9 @@
 		"url": "https://hooks.slack.com/services/LOLOLOLOLOLOLOLOLOL",
 		"username": "Last.fm Audio Bot",
 		"icon": ":lastfm:"
-	}
+	},
+    "flags":{
+        "spotify": false
+    }
+    
 }

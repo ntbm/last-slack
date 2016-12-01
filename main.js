@@ -56,13 +56,38 @@ function checkIfTrackIsPlayingAndNew(track) {
 		trackName = "\"" + track.name + "\" by " + track.artist["#text"];
 
 		if (currentTrack != trackName) {
-			console.log(trackName);
-			if (!commander.quiet) {
-				sendMessageToSlack(trackName);
-			}
+			if(!config.flags.spotify){
+                console.log(trackName);
+			    if (!commander.quiet) {
+				    sendMessageToSlack(trackName);
+			    }
+            }else{
+                findSpotifyLink(track, function(link){
+                    console.log(trackName + "\n"+ link);
+                    if(!commander.quiet){
+                        sendMessageToSlack(trackName + "\n"+ link);
+                    }
+                })
+            }
 			currentTrack = trackName;
 		}
 	}
+}
+function findSpotifyLink(track, cb){
+    var s = track.name.replace("&", " and ").replace(" ", "+") + "+" + track.artist["#text"].replace("&"," and ").replace(" ", "+");
+    var url = "https://api.spotify.com/v1/search?type=track&limit=1&q=" + s 
+    request(url, function(error, response, body){
+        if(!error && response.statusCode == 200){
+            data = JSON.parse(body);
+            if(data.tracks.items.length != 0){
+                cb(data.tracks.items[0].external_urls.spotify)
+            }else{
+                cb('')
+            }
+        }else{
+            cb('')
+        }
+    })   
 }
 
 function sendMessageToSlack(message) {
